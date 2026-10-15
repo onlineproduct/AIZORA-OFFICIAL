@@ -1,0 +1,14 @@
+name = "aizora-official-v03"
+main = "src/index.js"
+compatibility_date = "2026-10-15"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+# Configure this after creating the D1 database:
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "aizora-official-db"
+# database_id = "REPLACE_WITH_REAL_D1_ID"
+# migrations_dir = "migrations"
