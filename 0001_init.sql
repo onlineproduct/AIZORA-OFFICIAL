@@ -1,0 +1,8 @@
+PRAGMA foreign_keys=ON;
+CREATE TABLE IF NOT EXISTS products(id INTEGER PRIMARY KEY AUTOINCREMENT,type TEXT NOT NULL CHECK(type IN ('physical','digital')),name TEXT NOT NULL,description TEXT NOT NULL DEFAULT '',price INTEGER NOT NULL CHECK(price>=0),icon TEXT NOT NULL DEFAULT '📦',stock INTEGER,active INTEGER NOT NULL DEFAULT 1);
+CREATE TABLE IF NOT EXISTS customers(id INTEGER PRIMARY KEY AUTOINCREMENT,email TEXT NOT NULL UNIQUE,display_name TEXT,password_hash TEXT,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS orders(id TEXT PRIMARY KEY,customer_id INTEGER REFERENCES customers(id),order_type TEXT NOT NULL CHECK(order_type IN ('physical','digital','mixed')),status TEXT NOT NULL DEFAULT 'Pending',total INTEGER NOT NULL CHECK(total>=0),currency TEXT NOT NULL DEFAULT 'BDT',payment_status TEXT NOT NULL DEFAULT 'unverified',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS order_items(id INTEGER PRIMARY KEY AUTOINCREMENT,order_id TEXT NOT NULL REFERENCES orders(id),product_id INTEGER REFERENCES products(id),product_name TEXT NOT NULL,unit_price INTEGER NOT NULL,quantity INTEGER NOT NULL CHECK(quantity>0));
+CREATE TABLE IF NOT EXISTS digital_entitlements(id INTEGER PRIMARY KEY AUTOINCREMENT,order_item_id INTEGER NOT NULL UNIQUE REFERENCES order_items(id),license_key_hash TEXT,private_file_key TEXT,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE INDEX IF NOT EXISTS idx_products_type ON products(type,active);
+CREATE INDEX IF NOT EXISTS idx_orders_customer ON orders(customer_id);
