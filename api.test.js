@@ -53,3 +53,15 @@ test('admin image upload requires authorization before storage access', async ()
   assert.equal(res.status, 401);
   assert.deepEqual(await res.json(), { error: 'Unauthorized' });
 });
+
+test('digital download refuses safely when D1 is not configured', async () => {
+  const token = 'a'.repeat(64);
+  const res = await worker.fetch(new Request('https://example.test/api/digital/download/' + token), env);
+  assert.equal(res.status, 503);
+  assert.deepEqual(await res.json(), { error: 'Digital download storage unavailable' });
+});
+
+test('digital download rejects malformed tokens before database access', async () => {
+  const res = await worker.fetch(new Request('https://example.test/api/digital/download/not-a-token'), env);
+  assert.equal(res.status, 400);
+});
