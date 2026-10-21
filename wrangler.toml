@@ -1,4 +1,4 @@
-name = "aizora-official-v03"
+name = "aizora-official-v04"
 main = "src/index.js"
 compatibility_date = "2026-10-15"
 
@@ -6,8 +6,7 @@ compatibility_date = "2026-10-15"
 directory = "./public"
 binding = "ASSETS"
 
-# D1 remains optional for demo mode. After creating the database,
-# uncomment this block and replace the placeholder with the real database ID.
+# Create a separate D1 database and insert its ID before enabling checkout/admin.
 # [[d1_databases]]
 # binding = "DB"
 # database_name = "aizora-official-db"
