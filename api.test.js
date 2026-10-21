@@ -65,3 +65,18 @@ test('digital download rejects malformed tokens before database access', async (
   const res = await worker.fetch(new Request('https://example.test/api/digital/download/not-a-token'), env);
   assert.equal(res.status, 400);
 });
+
+test('digital asset administration requires authorization', async () => {
+  const res = await worker.fetch(new Request('https://example.test/api/admin/digital-assets'), env);
+  assert.equal(res.status, 401);
+  assert.deepEqual(await res.json(), { error: 'Unauthorized' });
+});
+
+test('digital asset administration refuses safely without D1', async () => {
+  const securedEnv = { ...env, ADMIN_TOKEN: 'test-token' };
+  const res = await worker.fetch(new Request('https://example.test/api/admin/digital-assets', {
+    headers: { authorization: 'Bearer test-token' }
+  }), securedEnv);
+  assert.equal(res.status, 503);
+  assert.deepEqual(await res.json(), { error: 'D1 not configured' });
+});
