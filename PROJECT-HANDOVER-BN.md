@@ -44,3 +44,8 @@
 - `ADMIN_TOKEN`, Cloudflare API token বা password GitHub-এ/চ্যাটে দেবেন না।
 - `wrangler d1 migrations apply ... --remote` বা `wrangler deploy` চালানো হয়নি।
 - Mother Editor, AIZORA Builder, AIZORA AI Camera, Live Studio ও অন্য live project/database স্পর্শ করা যাবে না।
+
+## অতিরিক্ত নিরাপত্তা সংশোধন (2026-10-22)
+- Checkout-এর সময় আগে তৈরি হওয়া email address দিয়ে ownership verification ছাড়া account claim করা বন্ধ করা হয়েছে।
+- `api.test.js`-এ এ আচরণের regression test যোগ করা হয়েছে।
+- আগে checkout করা customer account চালু করতে পরে email ownership verification/claim flow যোগ করতে হবে; সেটি এখনো production-ready নয়।
