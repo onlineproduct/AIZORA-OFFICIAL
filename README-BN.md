@@ -1,4 +1,4 @@
-# AIZORA OFFICIAL v0.4
+# AIZORA OFFICIAL v0.4.1
 
 স্বতন্ত্র Cloudflare Worker + Static Assets + D1 database-ভিত্তিক অনলাইন স্টোর।
 
@@ -23,3 +23,8 @@
 
 ## Deployment safety
 এটি আলাদা `aizora-official-v04` Worker name ব্যবহার করে। Mother Editor, AIZORA Builder বা অন্য live project পরিবর্তন করবেন না। Real D1 ID/secret সেট এবং migration চালানোর আগে live checkout চালু করবেন না।
+
+## Sales report ও inventory safeguards
+- Admin report `/api/admin/reports` কেবল `ADMIN_TOKEN`-সহ admin request-এ পাওয়া যায়। Gross order value এবং verified-payment revenue আলাদা দেখানো হয়।
+- Migration `0003_stock_guard.sql` প্রয়োগের পরে negative inventory আটকানোর trigger সক্রিয় হবে।
+- CI green হওয়া মানে syntax/unit tests ও Wrangler dry-run সফল; এটি বাস্তব D1, gateway, R2 বা live browser acceptance test-এর বিকল্প নয়।
