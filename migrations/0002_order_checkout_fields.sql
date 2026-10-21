@@ -1,0 +1,6 @@
+ALTER TABLE orders ADD COLUMN payment_method TEXT NOT NULL DEFAULT 'cod';
+ALTER TABLE orders ADD COLUMN payment_reference TEXT NOT NULL DEFAULT '';
+ALTER TABLE orders ADD COLUMN shipping_name TEXT NOT NULL DEFAULT '';
+ALTER TABLE orders ADD COLUMN shipping_phone TEXT NOT NULL DEFAULT '';
+ALTER TABLE orders ADD COLUMN shipping_address TEXT NOT NULL DEFAULT '';
+ALTER TABLE orders ADD COLUMN customer_email TEXT NOT NULL DEFAULT '';
