@@ -80,3 +80,22 @@ test('digital asset administration refuses safely without D1', async () => {
   assert.equal(res.status, 503);
   assert.deepEqual(await res.json(), { error: 'D1 not configured' });
 });
+
+test('customer account routes fail closed without D1', async () => {
+  const paths = ['/api/account/register', '/api/account/login', '/api/account/me', '/api/account/orders'];
+  for (const path of paths) {
+    const res = await worker.fetch(new Request('https://example.test' + path, {
+      method: path.endsWith('/register') || path.endsWith('/login') ? 'POST' : 'GET',
+      headers: {'content-type':'application/json'},
+      body: path.endsWith('/register') || path.endsWith('/login') ? JSON.stringify({name:'Test User',email:'test@example.com',password:'long-test-password'}) : undefined
+    }), env);
+    assert.equal(res.status, 503, path);
+  }
+});
+
+test('customer logout clears session cookie even if D1 is missing', async () => {
+  const res = await worker.fetch(new Request('https://example.test/api/account/logout', {
+    method: 'POST'
+  }), env);
+  assert.equal(res.status, 503);
+});
