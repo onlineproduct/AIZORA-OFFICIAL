@@ -1,11 +1,11 @@
-# AIZORA OFFICIAL — Release Readiness Review (v0.4.4)
+# AIZORA OFFICIAL — Release Readiness Review (v0.4.5)
 
 Review date: 2026-10-22
 
 ## Phase status
-**ধাপ ২ — ফিচার ইমপ্লিমেন্টেশন: সম্পন্ন।** মূল storefront, admin, physical/digital order flow, manual payment verification, customer account ও digital delivery-এর কোড PR branch-এ আছে।
+**ধাপ ২ — ফিচার ইমপ্লিমেন্টেশন: PR branch-এ সম্পন্ন।** Storefront, admin, physical/digital order flow, manual payment verification, customer account ও digital delivery-এর কোড আছে।
 
-**লাইভ রিলিজের অবস্থা: NOT READY.** CI সফল হলেও বাস্তব Cloudflare staging ও browser end-to-end acceptance test এখনও করা হয়নি। Phase 2 completion must not be interpreted as production payment approval.
+**লাইভ রিলিজের অবস্থা: NOT READY.** সর্বশেষ CI সফল হলেও বাস্তব Cloudflare staging ও browser end-to-end acceptance test চালানো যায়নি/হয়নি। Phase 2 completion-কে production approval হিসেবে ধরা যাবে না।
 
 ## Implemented in PR branch
 - Bengali responsive storefront, product search, local cart, checkout and order tracking.
@@ -14,27 +14,26 @@ Review date: 2026-10-22
 - Digital file upload up to 512 KB; verified-payment license/download entitlement, 30-day expiry, 10-download cap and account-side reissue cooldown.
 - Customer registration/login with PBKDF2 password hashing, hashed session tokens, expiring HttpOnly/Secure/SameSite cookies, logout and own order history.
 - Migrations 0001–0008; CI applies migrations locally and runs syntax checks, API unit tests and Wrangler deploy dry-run.
+- Checkout notice lists bKash/Nagad number 01824257315 and WhatsApp contact; payment is manually verified by admin.
 
-## Latest security hardening
-- Registration now rejects an email already present from checkout unless a verified account-claim flow is implemented; regression test added. This avoids unverified takeover, but means prior checkout customers need a future ownership-verification flow to register.
+## Checks performed by assistant
+- Queried GitHub Actions run `39664377804` for current head commit `89b110193cd4b3a5fb3b88137381d3fc3072545b`: **success**.
+- Confirmed every step in that CI job succeeded: dependency install, local D1 migrations, syntax checks for `src/index.js`, `public/app.js`, `public/admin.js`, `npm test`, and Wrangler deploy dry-run.
+- Reviewed the Worker checkout, account, digital-download and admin routes, storefront checkout/tracking code, Wrangler target and PR status.
+- Confirmed PR #1 remains open, draft, unmerged; no production deploy or remote D1 migration was performed.
+- Important limitation: CI uses local D1/mocks and a deploy dry-run; it does not prove a live Cloudflare Worker/D1 environment or real mobile-browser flow.
 
-## CI result
-Run https://github.com/onlineproduct/AIZORA-OFFICIAL/actions/runs/39662316091 completed successfully: local migrations, syntax checks, API tests and dry-run passed. This is not a production deploy or real staging test.
-
-## Phase 3 blockers before production
-1. D1-backed staging tests for checkout, stock contention, order tracking, admin authorization, image upload, payment status, account ownership and digital delivery.
+## Remaining blockers before production
+1. Configure/identify a separate staging Worker + D1 and run end-to-end tests for checkout, inventory contention, order tracking, admin authorization, image upload, payment status, account ownership and digital delivery.
 2. bKash/Nagad automatic payment gateway/webhook is not integrated; current payment verification is manual.
 3. Automated email/SMS delivery is not implemented.
-4. D1 digital upload is limited to 512 KB; larger APK/ZIP delivery needs a suitable private object-storage design.
+4. D1 digital file uploads are limited to 512 KB; larger APK/ZIP delivery needs a suitable private storage design.
 5. Rate limiting/abuse controls, privacy/retention review and mobile browser acceptance testing remain.
-6. No remote migration or production deploy has been performed. Do not deploy or merge until staging tests and release review are approved.
+6. Account claiming for an email previously used at checkout is intentionally blocked until a verified ownership flow exists.
+7. Confirm secure production secrets/admin-token setup and migration plan before release.
 
 ## Safety boundary
-- Worker target remains the separate `aizora-official-v04` project.
+- Worker target in config is the separate `aizora-official-v04` project; this alone does not prove a live staging environment exists.
 - Do not touch Mother Editor, AIZORA Builder, AIZORA AI Camera, Live Studio, Cloudfloor Store, or their databases.
-- Do not use `wrangler d1 migrations apply ... --remote` or `wrangler deploy` as part of this phase status update.
-
-## Latest change verification
-- Commit `3f77c0936425aac3c89526ebf8e7572d5732e7e8`: blocks unverified checkout-email account claiming.
-- Commit `d3447e7ece077ccbc97dcbc2a2b155c49a347201`: adds regression test for that protection.
-- CI for these latest commits must finish successfully before considering this change verified.
+- Do not run remote D1 migrations or production deploy until staging tests and release review are approved.
+- Never commit or share ADMIN_TOKEN, passwords, or Cloudflare API tokens.
