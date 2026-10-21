@@ -7,7 +7,7 @@ const env = { ASSETS: { fetch: async () => new Response('asset') } };
 test('health endpoint reports API and configuration state', async () => {
   const res = await worker.fetch(new Request('https://example.test/api/health'), env);
   assert.equal(res.status, 200);
-  assert.deepEqual(await res.json(), { ok: true, database: false, adminConfigured: false });
+  assert.deepEqual(await res.json(), { ok: true, database: false, adminConfigured: false, mediaConfigured: false });
 });
 
 test('products endpoint returns demo products without D1', async () => {
@@ -46,4 +46,10 @@ test('admin reports safely refuse when D1 is not configured', async () => {
     headers: { authorization: 'Bearer test-token' }
   }), securedEnv);
   assert.equal(res.status, 503);
+});
+
+test('admin image upload requires authorization before storage access', async () => {
+  const res = await worker.fetch(new Request('https://example.test/api/admin/uploads', { method: 'POST' }), env);
+  assert.equal(res.status, 401);
+  assert.deepEqual(await res.json(), { error: 'Unauthorized' });
 });
