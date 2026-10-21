@@ -13,6 +13,7 @@ jobs:
         with:
           node-version: 22
       - run: npm install
+      - run: npx wrangler d1 migrations apply aizora-official-db --local
       - run: node --check src/index.js
       - run: node --check public/app.js
       - run: node --check public/admin.js

@@ -1,30 +1,36 @@
-# AIZORA OFFICIAL v0.4.1
+# AIZORA OFFICIAL v0.4.2 — পরীক্ষাধীন পরিবর্তন
 
-স্বতন্ত্র Cloudflare Worker + Static Assets + D1 database-ভিত্তিক অনলাইন স্টোর।
+স্বতন্ত্র Cloudflare Worker + Static Assets + D1 database-ভিত্তিক physical ও digital online store।
 
-## বর্তমানে সোর্সে যা আছে
-- মোবাইল-ফ্রেন্ডলি বাংলা storefront; ফিজিক্যাল/ডিজিটাল পণ্য তালিকা ও সার্চ।
-- Cart, server-side price lookup-সহ checkout API, order ID এবং order tracking API।
-- Cash on Delivery, bKash/Nagad transaction reference জমা (এটি নিজে payment verify করে না)।
-- Admin UI: পণ্য যোগ, অর্ডার দেখা, order/payment status পরিবর্তন।
-- D1 schema/migration, basic automated API tests, GitHub Actions CI এবং Wrangler dry-run।
-- Admin API-তে `ADMIN_TOKEN` secret দিয়ে Bearer-token access control।
+## বর্তমান storefront/API
+- বাংলা storefront, physical/digital catalog ও search, cart, checkout form, order ID এবং tracking API।
+- Checkout-এ server-side product price lookup; COD, bKash/Nagad transaction reference গ্রহণ।
+- Admin API: product creation, orders, payment/order status updates, sales reports; Bearer `ADMIN_TOKEN` আবশ্যক।
+- D1 schema ও migrations 0001–0003; stock guard trigger।
+- Automated API tests ও GitHub Actions CI।
 
-## গুরুত্বপূর্ণ সীমাবদ্ধতা
-- এই commit-এ checkout/admin কার্যকর করতে Cloudflare-এ আলাদা D1 database তৈরি করে ID bind করতে হবে; `wrangler.toml`-এ database binding এখন ইচ্ছাকৃতভাবে মন্তব্য করা।
-- Cloudflare Worker-এ `ADMIN_TOKEN` secret সেট না করলে Admin API ব্যবহার করা যাবে না।
-- bKash/Nagad-এর আসল payment gateway/webhook integration নেই; transaction reference শুধু জমা হয় এবং admin হাতে যাচাই করবেন।
-- Customer password login/session নেই। Checkout email নেয়, কিন্তু এটি customer account/login নয়।
-- Digital license generation, private R2 download delivery, automated email/SMS, image upload, shipping integration এখনো production-ready নয়।
-- D1 migration চালানো, real Cloudflare deployment, production checkout এবং mobile/browser acceptance test সফল হয়েছে—এমন দাবি করা হচ্ছে না।
+## PR #1: একই স্ক্রিনে দ্রুত পণ্য যোগ
+- Admin form-এ একসঙ্গে পণ্যের ধরন, নাম, বিবরণ, বিক্রয়মূল্য, আগের দাম/discount, stock এবং ছবি।
+- HTTPS image URL দেওয়া যায়।
+- R2 binding `MEDIA_BUCKET` configured থাকলে 5 MB পর্যন্ত JPG/PNG/WEBP/GIF upload হয়।
+- Storefront card uploaded image, old price এবং discount দেখায়।
+- Migration `0004_product_media_and_discounts.sql` image URL, compare-at price ও digital file key field যোগ করে।
+- এই পরিবর্তন feature branch/PR #1-এ আছে; main-এ merge হয়েছে বা live deploy হয়েছে—এমন নয়।
+
+## বাধ্যতামূলক setup
+1. PR review/CI success-এর পরে migration 0004 D1-এ apply করুন।
+2. Cloudflare R2 bucket-এ `MEDIA_BUCKET` binding দিন; না হলে image file upload 503 দেবে। তখন HTTPS image URL ব্যবহার করা যায়।
+3. Cloudflare Worker secret `ADMIN_TOKEN` সেট করুন; secret public repo বা chat-এ রাখবেন না।
+4. Deploy করার আগে D1 binding এবং environment configuration পুনরায় যাচাই করুন।
+
+## Production blockers
+- bKash/Nagad official gateway/webhook verification নেই; transaction reference জমা হওয়া payment verified হওয়া নয়।
+- Customer password login/session নেই।
+- Private digital file delivery, license key generation, entitlement issuance সম্পূর্ণ হয়নি।
+- Shipping integration, automated email/SMS ও browser/mobile acceptance tests বাকি।
+- CI green হলেই production readiness নিশ্চিত হয় না। এই blockers বন্ধ এবং বাস্তব পরীক্ষা সফল না হওয়া পর্যন্ত live customer orders/payment চালু করবেন না।
 
 ## Local verification
-`npm install`, `npm test`, `npx wrangler deploy --dry-run` চালান। CI একই পরীক্ষা চালায়।
+`npm install`, `npm test`, `node --check src/index.js`, `node --check public/app.js`, `node --check public/admin.js`, `npx wrangler deploy --dry-run`।
 
-## Deployment safety
-এটি আলাদা `aizora-official-v04` Worker name ব্যবহার করে। Mother Editor, AIZORA Builder বা অন্য live project পরিবর্তন করবেন না। Real D1 ID/secret সেট এবং migration চালানোর আগে live checkout চালু করবেন না।
-
-## Sales report ও inventory safeguards
-- Admin report `/api/admin/reports` কেবল `ADMIN_TOKEN`-সহ admin request-এ পাওয়া যায়। Gross order value এবং verified-payment revenue আলাদা দেখানো হয়।
-- Migration `0003_stock_guard.sql` প্রয়োগের পরে negative inventory আটকানোর trigger সক্রিয় হবে।
-- CI green হওয়া মানে syntax/unit tests ও Wrangler dry-run সফল; এটি বাস্তব D1, gateway, R2 বা live browser acceptance test-এর বিকল্প নয়।
+অন্য live project—Mother Editor, AIZORA Builder, AI Camera, Live Studio, Cloudfloor Store—পরিবর্তন করবেন না।
