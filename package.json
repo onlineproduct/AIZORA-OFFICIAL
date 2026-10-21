@@ -1,6 +1,6 @@
 {
   "name": "aizora-official",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "type": "module",
   "private": true,
   "scripts": { "dev": "wrangler dev", "deploy": "wrangler deploy", "migrate": "wrangler d1 migrations apply aizora-official-db --remote", "test": "node --test api.test.js" },
