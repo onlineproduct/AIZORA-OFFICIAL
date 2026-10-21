@@ -1,20 +1,25 @@
-# AIZORA OFFICIAL v0.3
-স্বতন্ত্র Cloudflare Worker + Static Assets + D1 database starter.
+# AIZORA OFFICIAL v0.4
 
-## কী আছে
-Responsive storefront, Physical/Digital products, search, demo cart (localStorage), GET /api/health, GET /api/products, GET /api/products?type=physical|digital, GET /api/orders/:id, D1 schema.
+স্বতন্ত্র Cloudflare Worker + Static Assets + D1 database-ভিত্তিক অনলাইন স্টোর।
 
-## কী নেই
-Production checkout, payment, login, admin dashboard, order creation, secure license issuance, private download, shipping workflow, automated tests. বাস্তব অর্থ লেনদেন বা গ্রাহকের সংবেদনশীল তথ্য সংগ্রহ করবেন না।
+## বর্তমানে সোর্সে যা আছে
+- মোবাইল-ফ্রেন্ডলি বাংলা storefront; ফিজিক্যাল/ডিজিটাল পণ্য তালিকা ও সার্চ।
+- Cart, server-side price lookup-সহ checkout API, order ID এবং order tracking API।
+- Cash on Delivery, bKash/Nagad transaction reference জমা (এটি নিজে payment verify করে না)।
+- Admin UI: পণ্য যোগ, অর্ডার দেখা, order/payment status পরিবর্তন।
+- D1 schema/migration, basic automated API tests, GitHub Actions CI এবং Wrangler dry-run।
+- Admin API-তে `ADMIN_TOKEN` secret দিয়ে Bearer-token access control।
 
-## সেটআপ
-1. নতুন GitHub repo ও আলাদা Cloudflare Worker project ব্যবহার করুন। অন্য AIZORA live project পরিবর্তন করবেন না।
-2. Node/Wrangler environment থাকলে `npm install` চালান।
-3. D1 ছাড়াই `npm run dev` চালালে sample products দিয়ে API demo mode চলে।
-4. D1 চালাতে `wrangler d1 create aizora-official-db` চালিয়ে পাওয়া ID wrangler.toml-এর commented D1 block uncomment করে বসান।
-5. `npm run migrate` দিয়ে remote D1 schema তৈরি করুন। Migration-এ sample product seed নেই: D1 খালি থাকলে পণ্যের তালিকা খালি থাকবে।
-6. `npm run deploy` দিয়ে নতুন project-এ deploy করুন। /api/health ও /api/products পরীক্ষা করুন।
-7. Android browser testing এবং Cloudflare deploy বাস্তবে এখনো করা হয়নি।
+## গুরুত্বপূর্ণ সীমাবদ্ধতা
+- এই commit-এ checkout/admin কার্যকর করতে Cloudflare-এ আলাদা D1 database তৈরি করে ID bind করতে হবে; `wrangler.toml`-এ database binding এখন ইচ্ছাকৃতভাবে মন্তব্য করা।
+- Cloudflare Worker-এ `ADMIN_TOKEN` secret সেট না করলে Admin API ব্যবহার করা যাবে না।
+- bKash/Nagad-এর আসল payment gateway/webhook integration নেই; transaction reference শুধু জমা হয় এবং admin হাতে যাচাই করবেন।
+- Customer password login/session নেই। Checkout email নেয়, কিন্তু এটি customer account/login নয়।
+- Digital license generation, private R2 download delivery, automated email/SMS, image upload, shipping integration এখনো production-ready নয়।
+- D1 migration চালানো, real Cloudflare deployment, production checkout এবং mobile/browser acceptance test সফল হয়েছে—এমন দাবি করা হচ্ছে না।
 
-## নিরাপত্তা
-Client cart ও price বিশ্বাস করে অর্ডার তৈরি করা যাবে না। Payment verification server-side webhook দিয়ে করতে হবে। Login, authorization, rate limiting, private R2 file access, license generation, CSRF protections, validation ও testing পরবর্তী ধাপ।
+## Local verification
+`npm install`, `npm test`, `npx wrangler deploy --dry-run` চালান। CI একই পরীক্ষা চালায়।
+
+## Deployment safety
+এটি আলাদা `aizora-official-v04` Worker name ব্যবহার করে। Mother Editor, AIZORA Builder বা অন্য live project পরিবর্তন করবেন না। Real D1 ID/secret সেট এবং migration চালানোর আগে live checkout চালু করবেন না।
