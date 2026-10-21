@@ -120,3 +120,27 @@ test('customer logout clears the browser session cookie even if D1 is missing', 
   assert.equal(res.status, 200);
   assert.match(res.headers.get('set-cookie') || '', /Max-Age=0/);
 });
+
+
+test('order tracking requires the email used at checkout', async () => {
+  const db = {
+    prepare: (sql) => ({
+      bind: (...args) => ({
+        first: async () => sql.includes('FROM orders WHERE id=?')
+          ? { id: args[0], status: 'Pending', total: 450, currency: 'BDT', payment_status: 'pending', created_at: '2026-10-22', customer_email: 'buyer@example.com' }
+          : null,
+        all: async () => ({ results: [] })
+      })
+    })
+  };
+  const securedEnv = { ...env, DB: db };
+  const missing = await worker.fetch(new Request('https://example.test/api/orders/AZ-ABC123'), securedEnv);
+  assert.equal(missing.status, 400);
+  const wrong = await worker.fetch(new Request('https://example.test/api/orders/AZ-ABC123?email=other@example.com'), securedEnv);
+  assert.equal(wrong.status, 404);
+  const correct = await worker.fetch(new Request('https://example.test/api/orders/AZ-ABC123?email=BUYER@example.com'), securedEnv);
+  assert.equal(correct.status, 200);
+  const body = await correct.json();
+  assert.equal(body.order.id, 'AZ-ABC123');
+  assert.equal(Object.hasOwn(body.order, 'customer_email'), false);
+});
