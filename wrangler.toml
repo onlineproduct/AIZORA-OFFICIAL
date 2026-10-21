@@ -6,7 +6,8 @@ compatibility_date = "2026-10-15"
 directory = "./public"
 binding = "ASSETS"
 
-# Configure this after creating the D1 database:
+# D1 remains optional for demo mode. After creating the database,
+# uncomment this block and replace the placeholder with the real database ID.
 # [[d1_databases]]
 # binding = "DB"
 # database_name = "aizora-official-db"
