@@ -1,4 +1,4 @@
-# AIZORA OFFICIAL — Release Readiness Review (v0.4.6)
+# AIZORA OFFICIAL — Release Readiness Review (v0.4.7)
 
 Review date: 2026-10-22
 
@@ -16,6 +16,7 @@ https://github.com/onlineproduct/AIZORA-OFFICIAL/actions/runs/39664752899
 - API unit tests: **15 passed, 0 failed**.
 - Wrangler deploy dry-run: passed; this is not a deployment.
 - Registration test blocks account claiming for an existing checkout email without ownership verification.
+- Order tracking now requires the email used at checkout; tests cover missing, mismatched and matching email cases. The response does not expose the stored customer email.
 - Checkout page displays the manual bKash/Nagad payment instructions and WhatsApp contact.
 
 ## Implemented in PR branch
