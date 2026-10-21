@@ -34,3 +34,16 @@ test('admin routes require a configured token', async () => {
   const res = await worker.fetch(new Request('https://example.test/api/admin/orders'), env);
   assert.equal(res.status, 401);
 });
+
+test('admin reports require a token', async () => {
+  const res = await worker.fetch(new Request('https://example.test/api/admin/reports'), env);
+  assert.equal(res.status, 401);
+});
+
+test('admin reports safely refuse when D1 is not configured', async () => {
+  const securedEnv = { ...env, ADMIN_TOKEN: 'test-token' };
+  const res = await worker.fetch(new Request('https://example.test/api/admin/reports', {
+    headers: { authorization: 'Bearer test-token' }
+  }), securedEnv);
+  assert.equal(res.status, 503);
+});
