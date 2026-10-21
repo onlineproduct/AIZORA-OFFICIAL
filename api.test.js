@@ -93,6 +93,26 @@ test('customer account routes fail closed without D1', async () => {
   }
 });
 
+test('registration cannot claim an existing checkout email without ownership verification', async () => {
+  const existingCustomerDb = {
+    prepare: (sql) => ({
+      bind: (...args) => ({
+        first: async () => sql === 'SELECT id,password_hash FROM customers WHERE email=?'
+          ? { id: 7, password_hash: null }
+          : null
+      })
+    })
+  };
+  const securedEnv = { ...env, DB: existingCustomerDb };
+  const res = await worker.fetch(new Request('https://example.test/api/account/register', {
+    method: 'POST',
+    headers: {'content-type':'application/json'},
+    body: JSON.stringify({name:'Test User',email:'buyer@example.com',password:'long-test-password'})
+  }), securedEnv);
+  assert.equal(res.status, 409);
+  assert.match((await res.json()).error, /মালিকানা যাচাই/);
+});
+
 test('customer logout clears the browser session cookie even if D1 is missing', async () => {
   const res = await worker.fetch(new Request('https://example.test/api/account/logout', {
     method: 'POST'
