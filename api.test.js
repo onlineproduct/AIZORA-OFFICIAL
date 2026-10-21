@@ -27,8 +27,7 @@ test('checkout safely refuses when D1 is not configured', async () => {
   const res = await worker.fetch(new Request('https://example.test/api/orders', {
     method: 'POST', headers: {'content-type':'application/json'}, body: JSON.stringify({items:[{product_id:1,quantity:1}]})
   }), env);
-  assert.equal(res.status, 200);
-  assert.match(res.headers.get('set-cookie') || '', /Max-Age=0/);
+  assert.equal(res.status, 503);
 });
 
 test('admin routes require a configured token', async () => {
@@ -98,5 +97,6 @@ test('customer logout clears the browser session cookie even if D1 is missing', 
   const res = await worker.fetch(new Request('https://example.test/api/account/logout', {
     method: 'POST'
   }), env);
-  assert.equal(res.status, 503);
+  assert.equal(res.status, 200);
+  assert.match(res.headers.get('set-cookie') || '', /Max-Age=0/);
 });
