@@ -6,9 +6,8 @@ compatibility_date = "2026-10-15"
 directory = "./public"
 binding = "ASSETS"
 
-# Create a separate D1 database and insert its ID before enabling checkout/admin.
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "aizora-official-db"
-# database_id = "REPLACE_WITH_REAL_D1_ID"
-# migrations_dir = "migrations"
+[[d1_databases]]
+binding = "DB"
+database_name = "aizora-official-db"
+database_id = "0270f7ef-51e1-4546-a136-5018242794f0"
+migrations_dir = "migrations"
