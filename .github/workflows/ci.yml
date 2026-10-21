@@ -13,5 +13,8 @@ jobs:
         with:
           node-version: 22
       - run: npm install
+      - run: node --check src/index.js
+      - run: node --check public/app.js
+      - run: node --check public/admin.js
       - run: npm test
       - run: npx wrangler deploy --dry-run
