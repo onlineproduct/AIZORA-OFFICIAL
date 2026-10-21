@@ -1,6 +1,6 @@
 # AIZORA OFFICIAL — Release Readiness Review (v0.4.7)
 
-Review date: 2026-10-22
+Review date: 2026-10-22 (updated after tracking validation fix)
 
 ## Phase status
 **ধাপ ২ — ফিচার ইমপ্লিমেন্টেশন: PR branch-এ সম্পন্ন।** Storefront, admin, physical/digital order flow, manual payment verification, customer account ও digital delivery-এর কোড আছে.
@@ -8,12 +8,14 @@ Review date: 2026-10-22
 **লাইভ রিলিজের অবস্থা: NOT READY.** সর্বশেষ CI সফল, কিন্তু বাস্তব Cloudflare staging ও browser end-to-end acceptance test এখনও সম্পন্ন নয়। Phase 2 completion-কে production approval হিসেবে ধরা যাবে না.
 
 ## Automated checks completed
-Latest CI run for commit `35ca3c128837844e08e62f1021f78df16aec9a42` succeeded:
-https://github.com/onlineproduct/AIZORA-OFFICIAL/actions/runs/39664752899
+Latest CI run for commit `6c75123007d60bd029b4cb34301d7b089a839d8f` succeeded:
+https://github.com/onlineproduct/AIZORA-OFFICIAL/actions/runs/39665461156
+
+- Latest run verified all 16 API unit tests passed (0 failed), including order-tracking email validation after the regex correction.
 
 - Local D1 migrations 0001–0008: passed.
 - Syntax checks for `src/index.js`, `public/app.js`, `public/admin.js`: passed.
-- API unit tests: **15 passed, 0 failed**.
+- API unit tests: **16 passed, 0 failed**.
 - Wrangler deploy dry-run: passed; this is not a deployment.
 - Registration test blocks account claiming for an existing checkout email without ownership verification.
 - Order tracking now requires the email used at checkout; tests cover missing, mismatched and matching email cases. The response does not expose the stored customer email.
