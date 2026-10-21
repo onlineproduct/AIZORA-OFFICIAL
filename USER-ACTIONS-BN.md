@@ -13,12 +13,18 @@
 - Automated tests checkout-created email-এর account claim বন্ধ থাকার regression check-সহ 16/16 পাস করেছে।
 - Production deploy বা remote D1 migration করা হয়নি।
 
+## ডেমো পণ্য প্রস্তুত
+- `scripts/seed-demo-products.sql`-এ ৩টি ফিজিক্যাল ও ৩টি ডিজিটাল ডেমো পণ্য রাখা হয়েছে। প্রতিটি নাম `DEMO ·` দিয়ে শুরু; ডিজিটাল ডেমোতে বাস্তব ফাইল/লাইসেন্স নেই।
+- এই SQL স্বয়ংক্রিয়ভাবে কোনো database-এ চালানো হয় না। আলাদা staging D1 তৈরি ও তার সঠিক ID/configuration নিশ্চিত হওয়ার পরই শুধু staging database-এ চালাতে হবে।
+- Production database-এ এটি কখনো চালাবেন না; ডেমো পণ্য দিয়ে বাস্তব গ্রাহকের অর্ডার নেওয়া যাবে না।
+
 ## পরবর্তী ধাপ — আলাদা staging তৈরি
 1. Cloudflare Dashboard → Storage & databases → D1 খুলুন।
 2. **নতুন, আলাদা staging database** তৈরি করুন; নাম দিন `aizora-official-staging-db`।
 3. নতুন database-এর Database ID শুধু এখানে দিন। Database ID secret নয়; কিন্তু কোনো API token, password বা `ADMIN_TOKEN` পাঠাবেন না।
 4. এই ID পাওয়ার পর staging-এর জন্য পৃথক Wrangler environment/binding তৈরি করে CI যাচাই করতে হবে। ID অনুমান করে বা production database পুনঃব্যবহার করে staging কনফিগার করা যাবে না।
 5. Staging Worker-এ `ADMIN_TOKEN` Cloudflare-এর Variables and Secrets থেকে আপনি নিজে সেট করবেন; secret chat/GitHub-এ দেবেন না।
+6. Staging Worker ও D1 binding নিশ্চিত হওয়ার পরই Cloudflare D1 execute-এ staging database বেছে `scripts/seed-demo-products.sql` চালান। আগে database name/ID দুবার যাচাই করুন।
 
 ## Staging acceptance checklist
 Staging-এ test data দিয়ে প্রতিটি ধাপ হাতে যাচাই করতে হবে:
