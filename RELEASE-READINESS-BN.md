@@ -15,6 +15,9 @@ Review date: 2026-10-22
 - Customer registration/login with PBKDF2 password hashing, hashed session tokens, expiring HttpOnly/Secure/SameSite cookies, logout and own order history.
 - Migrations 0001–0008; CI applies migrations locally and runs syntax checks, API unit tests and Wrangler deploy dry-run.
 
+## Latest security hardening
+- Registration now rejects an email already present from checkout unless a verified account-claim flow is implemented; regression test added. This avoids unverified takeover, but means prior checkout customers need a future ownership-verification flow to register.
+
 ## CI result
 Run https://github.com/onlineproduct/AIZORA-OFFICIAL/actions/runs/39662316091 completed successfully: local migrations, syntax checks, API tests and dry-run passed. This is not a production deploy or real staging test.
 
@@ -30,3 +33,8 @@ Run https://github.com/onlineproduct/AIZORA-OFFICIAL/actions/runs/39662316091 co
 - Worker target remains the separate `aizora-official-v04` project.
 - Do not touch Mother Editor, AIZORA Builder, AIZORA AI Camera, Live Studio, Cloudfloor Store, or their databases.
 - Do not use `wrangler d1 migrations apply ... --remote` or `wrangler deploy` as part of this phase status update.
+
+## Latest change verification
+- Commit `3f77c0936425aac3c89526ebf8e7572d5732e7e8`: blocks unverified checkout-email account claiming.
+- Commit `d3447e7ece077ccbc97dcbc2a2b155c49a347201`: adds regression test for that protection.
+- CI for these latest commits must finish successfully before considering this change verified.
