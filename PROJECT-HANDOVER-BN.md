@@ -1,45 +1,38 @@
-# AIZORA OFFICIAL — Handover v0.4.2 (প্রস্তাবিত পরিবর্তন; PR #1)
+# AIZORA OFFICIAL — Handover v0.4.3 (PR #1; staging/release review pending)
 
 ## প্রকল্পের সীমা
-এটি স্বতন্ত্র AIZORA OFFICIAL ই-কমার্স প্রকল্প। Mother Editor, AIZORA Universal App Builder, AIZORA AI Camera, Live Studio বা Cloudfloor Store-এর live repo/deployment পরিবর্তন করা যাবে না।
+এটি স্বতন্ত্র AIZORA OFFICIAL ই-কমার্স প্রকল্প। Mother Editor, AIZORA Universal App Builder, AIZORA AI Camera, Live Studio, Cloudfloor Store বা অন্য কোনো live repo/deployment/database পরিবর্তন করা যাবে না।
 
 ## ব্র্যান্ড সিদ্ধান্ত
-- বর্তমানে repository/technical project: `AIZORA-OFFICIAL`
-- ভবিষ্যতে কাস্টমারদের সামনে দেখানো নাম: `AIZORA EASY`
-- নাম পরিবর্তন হবে সাইট পরীক্ষা ও feature completion-এর পরে; repository/Cloudflare resource name এখন পরিবর্তন করা হবে না।
+- Repository/technical project: `AIZORA-OFFICIAL`
+- পূর্বের সিদ্ধান্ত অনুযায়ী customer-facing নাম পরবর্তী পর্যায়ে `AIZORA EASY` করা হবে।
+- নাম, production Worker বা live deployment এখন পরিবর্তন করা হবে না।
 
-## বর্তমান কোডে আছে
-- বাংলা storefront, physical/digital catalog, search, cart, checkout form এবং order tracking API/UI।
-- D1 schema: products, customers, orders, order_items, digital_entitlements।
-- Admin-token protected product creation, order management, payment status update, sales report।
-- API unit tests এবং GitHub Actions CI workflow।
-- Order checkout server-side product price lookup করে; bKash/Nagad transaction reference নেয়, কিন্তু gateway/webhook দিয়ে payment নিজে verify করে না।
-- Migration 0003 stock guard trigger যোগ করে।
+## বর্তমান branch ও PR
+- Branch: `feature/one-screen-product-upload`
+- PR #1: https://github.com/onlineproduct/AIZORA-OFFICIAL/pull/1
+- পরিবর্তনগুলো এখনো PR branch-এ; main-এ merge বা production-এ deploy করা হয়নি।
 
-## PR #1-এ প্রস্তাবিত পরিবর্তন (এখনো main-এ merge করা হয়নি)
-- Migration 0004: `image_url`, `compare_at_price`, `digital_file_key` columns।
-- Admin-এর এক স্ক্রিনে physical/digital type, নাম, description, sale price, optional old price/discount, stock, image file/HTTPS image URL।
-- R2 `MEDIA_BUCKET` binding থাকলে 5 MB পর্যন্ত JPG/PNG/WEBP/GIF image upload; public product-image route।
-- Storefront product cards uploaded image এবং discount display করে।
-- নতুন upload authorization test।
+## ধাপ ২-এর কোডে অন্তর্ভুক্ত
+- বাংলা storefront: physical/digital product list, search, cart, checkout, order tracking।
+- Admin-token protected product creation, order management, manual payment-status update, sales report।
+- একই admin screen-এ product image upload/change/remove; D1-এ image storage (সর্বোচ্চ 700 KB)।
+- Digital product file upload (সর্বোচ্চ 512 KB), verified payment-এর পরে license/download entitlement creation, 30-day expiry এবং 10-download limit।
+- Customer registration/login, PBKDF2 password hash, hashed expiring sessions এবং HttpOnly/Secure/SameSite cookie।
+- Customer নিজের order history দেখতে পারে; verified digital delivery-এর license/link পুনরায় ইস্যু করার জন্য 15-minute cooldown আছে।
+- Migrations 0001–0008: core schema, checkout fields, stock guard, product media/discounts, D1 image storage, digital delivery, customer sessions, digital reissue cooldown।
+- CI: local D1 migration smoke test, JS syntax checks, API unit tests এবং Wrangler deploy dry-run।
 
-## বাধ্যতামূলক external setup
-- PR merge হওয়ার পরে তবেই migration 0004 apply করতে হবে; আগে নয়।
-- Direct image upload-এর জন্য Cloudflare R2 bucket তৈরি/বেছে নিয়ে Worker-এ `MEDIA_BUCKET` binding করতে হবে।
-- Worker-এ `ADMIN_TOKEN` secret থাকতে হবে; token chat বা public repo-তে লেখা যাবে না।
-- বর্তমান `wrangler.toml` D1 binding ব্যবহার করে; production deployment-এ যাওয়ার আগে actual binding/configuration যাচাই করতে হবে।
+## এখনও বাস্তব staging-এ যাচাই বাকি
+- Customer register/login/logout/order history-এর D1-backed end-to-end test।
+- Checkout/stock, admin payment verification, image upload, digital fulfillment, expiry/download limit এবং reissue cooldown-এর end-to-end tests।
+- Browser/mobile acceptance test ও staging Worker/D1 binding validation।
+- bKash/Nagad automatic payment gateway/webhook, automated email/SMS এবং বড় digital file object storage নেই। D1 digital upload limit 512 KB; বড় APK/ZIP-এর জন্য উপযুক্ত নয়।
+- তাই এই সংস্করণকে এখনো live customer payment-এর জন্য production-ready বলা যাবে না।
 
-## এখনো production-ready নয়
-- Private digital file upload/download ও entitlement issue flow সম্পূর্ণ হয়নি।
-- Real bKash/Nagad payment gateway/webhook নেই।
-- Customer password login/session নেই।
-- Automated email/SMS, shipping integration এবং browser/mobile acceptance test নেই।
-- PR #1-এর CI ফল এখনো যাচাই হয়নি; CI green হলেও live deployment/browser acceptance test-এর বিকল্প নয়।
-- Live customer orders/payment নেওয়া যাবে না যতক্ষণ blockers সমাধান ও test না হয়।
-
-## কাজের নিয়ম
-1. আগে পৃথক branch/PR-এ পরিবর্তন ও পরীক্ষা।
-2. PR/CI review ছাড়া main merge নয়।
-3. Migration apply/deploy করার আগে database, secret ও storage binding নিশ্চিত করতে হবে।
-4. Mother Editor বা অন্য live project স্পর্শ করা যাবে না।
-5. Android-friendly বাংলা ধাপে নির্দেশনা দিতে হবে এবং যাচাই ছাড়া completed/live দাবি করা যাবে না।
+## নিরাপদ পরবর্তী ধাপ
+1. সর্বশেষ CI run-এ migrations 0001–0008, syntax, tests এবং dry-run সব green কি না নিশ্চিত করা।
+2. আলাদা staging Worker/D1-এ end-to-end tests করা।
+3. ফলাফল review করে তবেই PR merge/deploy অনুমোদনের কথা ভাবা।
+4. কোনো remote migration বা production deploy এই হ্যান্ডওভার আপডেটের অংশ নয়।
+5. Mother Editor, AIZORA Builder, AIZORA AI Camera, Live Studio বা অন্য live project/database স্পর্শ করা যাবে না।
